@@ -1,4 +1,4 @@
-# 한국어 형태소 분석
+# 한국어 분석
 
 ## KoNLPy 설치
 
@@ -52,6 +52,82 @@ print(malist)
 
 ## 형태소 분석을 기반으로 한 단어 출현 빈도 구하기
 
+- 박경리 토지 소설에서 많이 등장한 단어 분석하기
+
+```
+import codecs
+from bs4 import BeautifulSoup
+from konlpy.tag import Twitter
+# utf-16 인코딩으로 파일을 열고 글자를 출력하기 --- (※1)
+fp = codecs.open("https://github.com/CUKykkim/morphological_analysis/blob/master/BEXX0003.txt", "r", encoding="utf-16")
+soup = BeautifulSoup(fp, "html.parser")
+body = soup.select_one("body > text")
+text = body.getText()
+# 텍스트를 한 줄씩 처리하기 --- (※2)
+twitter = Twitter()
+word_dic = {}
+lines = text.split("\n")
+for line in lines:
+    malist = twitter.pos(line)
+    for word in malist:
+        if word[1] == "Noun": #  명사 확인하기 --- (※3)
+            if not (word[0] in word_dic):
+                word_dic[word[0]] = 0
+            word_dic[word[0]] += 1 # 카운트하기
+# 많이 사용된 명사 출력하기 --- (※4)
+keys = sorted(word_dic.items(), key=lambda x:x[1], reverse=True)
+for word, count in keys[:50]:
+    print("{0}({1}) ".format(word, count), end="")
+print()
+```
 
 
 
+
+## Gensim의 Word2Vec으로 단어 벡터화 하기
+
+- Gensim 설치
+
+```
+pip install gensim
+```
+
+- Gensim의 word2vec으로 토지에 나오는 단어 벡터화 하기
+
+```
+import codecs
+from bs4 import BeautifulSoup
+from konlpy.tag import Twitter
+from gensim.models import word2vec
+# utf-16 인코딩으로 파일을 열고 글자를 출력하기 --- (※1)
+fp = codecs.open("BEXX0003.txt", "r", encoding="utf-16")
+soup = BeautifulSoup(fp, "html.parser")
+body = soup.select_one("body > text")
+text = body.getText()
+# 텍스트를 한 줄씩 처리하기 --- (※2)
+twitter = Twitter()
+results = []
+lines = text.split("\r\n")
+for line in lines:
+    # 형태소 분석하기 --- (※3)
+    # 단어의 기본형 사용
+    malist = twitter.pos(line, norm=True, stem=True)
+    r = []
+    for word in malist:
+        # 어미/조사/구두점 등은 대상에서 제외 
+        if not word[1] in ["Josa", "Eomi", "Punctuation"]:
+            r.append(word[0])
+    rl = (" ".join(r)).strip()
+    results.append(rl)
+    print(rl)
+# 파일로 출력하기  --- (※4)
+gubun_file = 'toji.gubun'
+with open(gubun_file, 'w', encoding='utf-8') as fp:
+    fp.write("\n".join(results))
+# Word2Vec 모델 만들기 --- (※5)
+data = word2vec.LineSentence(gubun_file)
+model = word2vec.Word2Vec(data, 
+    vector_size=200, window=10, hs=1, min_count=2, sg=1)
+model.save("toji.model")
+print("ok")
+```
