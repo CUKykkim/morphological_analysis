@@ -29,9 +29,6 @@ Java(TM) SE Runtime Environment (build 17.0.6+9-LTS-190)
 Java HotSpot(TM) 64-Bit Server VM (build 17.0.6+9-LTS-190, mixed mode, sharing)
 ```
 
-```
-apt-get install g++ openjdk-8-jdk
-```
 
 - KoNLPy 패키지 설치
 
@@ -59,7 +56,7 @@ import codecs
 from bs4 import BeautifulSoup
 from konlpy.tag import Twitter
 # utf-16 인코딩으로 파일을 열고 글자를 출력하기 --- (※1)
-fp = codecs.open("https://github.com/CUKykkim/morphological_analysis/blob/master/BEXX0003.txt", "r", encoding="utf-16")
+fp = codecs.open("BEXX0003.txt", "r", encoding="utf-16")
 soup = BeautifulSoup(fp, "html.parser")
 body = soup.select_one("body > text")
 text = body.getText()
