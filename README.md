@@ -131,3 +131,11 @@ model = word2vec.Word2Vec(data,
 model.save("toji.model")
 print("ok")
 ```
+
+
+```
+from gensim.models import word2vec
+ko_model = gensim.models.Word2Vec.load('./model/ko/ko.bin')
+a = ko_model.wv.most_similar("강아지")
+print(a)
+```
