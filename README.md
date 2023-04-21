@@ -132,7 +132,7 @@ model.save("toji.model")
 print("ok")
 ```
 
-# 벡터화 된 단어들 확인
+## 벡터화 된 단어들 확인
 
 
 ```
